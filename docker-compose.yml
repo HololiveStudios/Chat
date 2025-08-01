@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=file:./dev.db
+      - JWT_SECRET=your-super-secret-jwt-key
+      - JWT_REFRESH_SECRET=your-super-secret-refresh-key
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    depends_on:
+      - redis
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    ports:
+      - "5175:5175"
+    environment:
+      - VITE_API_URL=http://localhost:3001
+      - VITE_SOCKET_URL=http://localhost:3001
+    volumes:
+      - ./web:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"

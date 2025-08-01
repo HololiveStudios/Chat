@@ -1,0 +1,97 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  username  String   @unique
+  email     String   @unique
+  password  String
+  avatar    String?
+  isOnline  Boolean  @default(false)
+  lastSeen  DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  sentMessages    Message[]    @relation("MessageSender")
+  roomMemberships RoomMember[]
+  createdRooms    Room[]       @relation("RoomCreator")
+  refreshTokens   RefreshToken[]
+
+  @@map("users")
+}
+
+model Room {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  type        String   // 'direct' | 'group'
+  isPrivate   Boolean  @default(false)
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  creator  User         @relation("RoomCreator", fields: [createdBy], references: [id], onDelete: Cascade)
+  members  RoomMember[]
+  messages Message[]
+
+  @@map("rooms")
+}
+
+model RoomMember {
+  id       String   @id @default(cuid())
+  userId   String
+  roomId   String
+  role     String   @default("member") // 'admin' | 'member'
+  joinedAt DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  room Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roomId])
+  @@map("room_members")
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  content   String
+  type      String   @default("text") // 'text' | 'image' | 'file' | 'system'
+  senderId  String
+  roomId    String
+  replyToId String?
+  status    String   @default("sent") // 'sending' | 'sent' | 'delivered' | 'read'
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  sender  User      @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+  room    Room      @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  replyTo Message?  @relation("MessageReply", fields: [replyToId], references: [id])
+  replies Message[] @relation("MessageReply")
+
+  @@map("messages")
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+}

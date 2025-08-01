@@ -1,0 +1,41 @@
+{
+  "name": "p2p-chat-monorepo",
+  "version": "1.0.0",
+  "description": "Monorepositório completo para aplicação de chat P2P multiplataforma",
+  "private": true,
+  "scripts": {
+    "install:all": "npm install && npm run install:backend && npm run install:web && npm run install:mobile && npm run install:desktop",
+    "install:backend": "cd backend && npm install",
+    "install:web": "cd web && npm install", 
+    "install:mobile": "cd mobile && npm install",
+    "install:desktop": "cd desktop && npm install",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:web\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:web": "cd web && npm run dev",
+    "dev:mobile": "cd mobile && npx expo start",
+    "build:all": "npm run build:backend && npm run build:web && npm run build:desktop && npm run build:android",
+    "build:backend": "cd backend && npm run build",
+    "build:web": "cd web && npm run build",
+    "build:desktop": "cd desktop && npm run build",
+    "build:android": "cd android && ./gradlew assembleRelease",
+    "test:all": "npm run test:backend && npm run test:web",
+    "test:backend": "cd backend && npm test",
+    "test:web": "cd web && npm test",
+    "clean": "npm run clean:all",
+    "clean:all": "rm -rf node_modules && rm -rf backend/node_modules && rm -rf web/node_modules && rm -rf mobile/node_modules && rm -rf desktop/node_modules"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "@typescript-eslint/eslint-plugin": "^6.7.4",
+    "@typescript-eslint/parser": "^6.7.4",
+    "eslint": "^8.50.0",
+    "prettier": "^3.0.3"
+  },
+  "workspaces": [
+    "backend",
+    "web",
+    "mobile",
+    "desktop",
+    "shared"
+  ]
+}

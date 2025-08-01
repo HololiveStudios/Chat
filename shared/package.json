@@ -1,0 +1,15 @@
+{
+  "name": "@p2p-chat/shared",
+  "version": "1.0.0",
+  "description": "Shared types and utilities for P2P Chat application",
+  "main": "index.ts",
+  "types": "index.ts",
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.2"
+  }
+}
